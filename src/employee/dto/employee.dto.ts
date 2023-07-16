@@ -1,5 +1,23 @@
-import { IsEmail, IsMobilePhone, IsNotEmpty, IsString } from "class-validator"
+import { ArrayMaxSize, ArrayMinSize, IsEmail, IsMobilePhone, IsNotEmpty, IsString } from "class-validator"
 
+
+class Contacts {
+
+    @IsNotEmpty()
+    isPrimary: string
+
+    @IsString()
+    @IsNotEmpty()
+    emergencyContact: string
+
+    @IsMobilePhone()
+    @IsNotEmpty()
+    phoneNumber: string
+
+    @IsString()
+    @IsNotEmpty()
+    relationship: string
+}
 export class EmployeeDto {
 
     @IsString()
@@ -26,4 +44,9 @@ export class EmployeeDto {
 
     @IsString()
     state: string
+
+    @IsNotEmpty()
+    @ArrayMaxSize(2)
+    @ArrayMinSize(2)
+    contacts: Contacts[]
 }

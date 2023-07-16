@@ -1,7 +1,7 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { EmployeeDto } from './dto';
+import { Contacts, EmployeeDto, UpdateEmployeeDto } from './dto';
 
 @Injectable()
 export class EmployeeService {
@@ -17,7 +17,12 @@ export class EmployeeService {
                     email: dto.email,
                     address: dto.address,
                     city: dto.city,
-                    state: dto.state
+                    state: dto.state,
+                    contacts: {
+                        createMany: {
+                            data: dto.contacts
+                        }
+                    }
                 }
             })
 
@@ -28,6 +33,51 @@ export class EmployeeService {
                     'credentials taken'
                 )
             }
+            throw error
+        }
+    }
+
+    async update(id: number, dto: UpdateEmployeeDto){
+        try {
+
+            const existingEmployee = await this.prisma.employee.findUnique({
+                where: { id },
+                include: { contacts: true },
+            })
+        
+            if (!existingEmployee) {
+            throw new NotFoundException('Employee not found');
+            }
+
+            const employee = await this.prisma.employee.update({
+                where: {id},
+                data: {
+                    fullName: dto.fullName,
+                    jobTitle: dto.jobTitle,
+                    phoneNumber: dto.phoneNumber,
+                    email: dto.email,
+                    address: dto.address,
+                    city: dto.city,
+                    state: dto.state,
+                    contacts: {
+                        updateMany: dto.contacts?.map((contactDto) => ({
+                            where: { id: parseInt(contactDto.contactId, 10) },
+                            data: {
+                              isPrimary: contactDto.isPrimary,
+                              emergencyContact: contactDto.emergencyContact,
+                              phoneNumber: contactDto.phoneNumber,
+                              relationship: contactDto.relationship,
+                            },
+                          })),
+                    }
+                },
+                include: {
+                    contacts: true
+                }
+            })
+
+            return employee
+        } catch (error) {
             throw error
         }
     }

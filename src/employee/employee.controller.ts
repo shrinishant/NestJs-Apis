@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
-import { EmployeeDto } from './dto';
+import { Contacts, EmployeeDto, UpdateEmployeeDto } from './dto';
 
 @Controller('employee')
 export class EmployeeController {
@@ -12,5 +12,10 @@ export class EmployeeController {
             dto
         })
         return this.employeeService.create(dto)
+    }
+
+    @Put('/update/:id')
+    update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateEmployeeDto){
+        return this.employeeService.update(id, dto)
     }
 }

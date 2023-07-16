@@ -1,4 +1,25 @@
-import { IsEmail, IsMobilePhone, IsOptional, IsString } from "class-validator"
+import { IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString } from "class-validator"
+
+export class Contacts {
+
+    @IsOptional()
+    isPrimary?: string
+
+    @IsString()
+    @IsOptional()
+    emergencyContact?: string
+
+    @IsMobilePhone()
+    @IsOptional()
+    phoneNumber?: string
+
+    @IsString()
+    @IsOptional()
+    relationship?: string
+
+    // @IsNotEmpty()
+    contactId: string
+}
 
 export class UpdateEmployeeDto {
 
@@ -19,11 +40,17 @@ export class UpdateEmployeeDto {
     email?: string
 
     @IsString()
+    @IsOptional()
     address?: string
 
     @IsString()
+    @IsOptional()
     city?: string
 
     @IsString()
+    @IsOptional()
     state?: string
+
+    @IsOptional()
+    contacts?: Contacts[];
 }
