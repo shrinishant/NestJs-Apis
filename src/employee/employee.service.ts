@@ -37,6 +37,34 @@ export class EmployeeService {
         }
     }
 
+    async getEmployees(page: number, pageSize: number){
+        try {
+            const skip = (page - 1) * pageSize
+
+            const employees = await this.prisma.employee.findMany({
+                skip,
+                take: pageSize,
+            })
+
+            const totalEmployees = await this.prisma.employee.count()
+
+            if(employees.length === 0){
+                throw new ForbiddenException(
+                    'Not enough Employee Record'
+                )
+            }
+            
+            return {
+                page,
+                pageSize,
+                totalEmployees,
+                employees
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
     async update(id: number, dto: UpdateEmployeeDto){
         try {
 
@@ -77,6 +105,54 @@ export class EmployeeService {
             })
 
             return employee
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getEmployeeById(id: number){
+        try {
+            const employee = await this.prisma.employee.findUnique({
+                where: {
+                    id
+                },
+                include: {
+                    contacts: true
+                }
+            })
+
+            if(employee){
+                return employee
+            }else{
+                throw new ForbiddenException(
+                    'Employee Not Found'
+                )
+            }
+        } catch (error) {
+            return error
+        }
+    }
+
+    async delete(id: number){
+        try {
+            const employee = await this.prisma.employee.findUnique({
+                where: {
+                    id
+                }
+            })
+
+            if(!employee) return new ForbiddenException('Employee Not Found')
+            else{
+                const deleteEmployee = await this.prisma.employee.delete({
+                    where: {
+                      id
+                    }
+                })
+                console.log(deleteEmployee)
+                return {
+                    status: true
+                }
+            }
         } catch (error) {
             throw error
         }
