@@ -10,9 +10,6 @@ export class EmployeeController {
 
     @Post('create')
     create(@Body() dto: EmployeeDto){
-        console.log({
-            dto
-        })
         return this.employeeService.create(dto)
     }
 

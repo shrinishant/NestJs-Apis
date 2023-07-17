@@ -143,6 +143,10 @@ export class EmployeeService {
 
             if(!employee) return new ForbiddenException('Employee Not Found')
             else{
+                await this.prisma.contact.deleteMany({
+                    where: { employeeId: id }
+                })
+                  
                 const deleteEmployee = await this.prisma.employee.delete({
                     where: {
                       id
